@@ -7,9 +7,11 @@ const int analogInPin = A0;  // Analog input pin that the potentiometer is attac
 int sensorValue = 0;  // value read from the pot
 int loop_resolution = 2; // ms
 int refresh_rate = 100; // ms
+unsigned long startTime = 0;
+unsigned long endTime = 0;
 unsigned long myTime = 0;
 int start_trigger = 800;
-int edge_flag = 0;
+int flag = 0;
 int status = 0;
 int counter = 0;
 
@@ -24,13 +26,15 @@ void setup()
   Serial.begin(9600);
 
   lcd.init();
-  lcd.backlight();
+  // lcd.backlight();
 
   // Clear the display buffer
   lcd.clear(); 
   // Set cursor (Column, Row)
   lcd.setCursor(0, 0);
-  lcd.print("Waiting for object");
+  lcd.print("Waiting for");
+  lcd.setCursor(0, 1);
+  lcd.print("object");
 
 }
 
@@ -45,7 +49,7 @@ void loop()
   Serial.print(sensorValue);
   Serial.print("\n");
 
-  if (sensorValue < start_trigger)
+  if ((sensorValue < start_trigger) && (status == 0))
   {
     status = 1;
   }
@@ -70,6 +74,11 @@ void loop()
   }
   else if(status == 2)
   {
+    if(flag == 0)
+    {
+      startTime = millis();
+      flag = 1;
+    }
 
     if((loop_resolution * counter) > refresh_rate) // define the LCD refresh rate (50 * 2ms = 100ms)
     {
@@ -82,10 +91,17 @@ void loop()
         lcd.print("Go !"); 
         lcd.setCursor(0,1);
         myTime = millis();
+        myTime -= startTime;
         myTime /= 1000.0;
         lcd.print(myTime);
         counter = 0;
       }
+    }
+
+    if (sensorValue < start_trigger)
+    {
+      status = 3;
+      endTime = myTime;
     }
 
   }
@@ -96,13 +112,24 @@ void loop()
       lcd.clear(); 
       lcd.setCursor(0, 0);       
       lcd.print("Finished :");
+      lcd.setCursor(0, 1);       
+      lcd.print(endTime);
       counter = 0;
     }
+
+    if(0)
+    {
+      // reset status and all variables
+      statut = 0;
+
+    }
+
+
   }
   else
   {
     // Clear the display buffer
-    lcd.clear(); 
+    //lcd.clear(); 
 
   }
 
