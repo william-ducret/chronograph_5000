@@ -5,7 +5,7 @@ The object must pass in front of a sensor to starts the timer, and the timer wil
 
 
 Features
-========================
+------------------------
 - Waits for an object to be placed in front of the IR sensor (used as proximity sensor)
 - Starts a timer when the object moves (away from the sensor)
 - Stops the timer when the object pass back in front of the sensor
