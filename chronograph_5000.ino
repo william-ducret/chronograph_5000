@@ -1,16 +1,25 @@
 
+// improvement :
+// - refreshing blinking : put a flag to display every information once, not continously
+// - integrate loop mode (for x laps, usage of switch in n mode)
+
 
 #include <LiquidCrystal_I2C.h>
 
-
 const int analogInPin = A0;  // Analog input pin that the potentiometer is attached to
-int sensorValue = 0;  // value read from the pot
-int loop_resolution = 2; // ms
+const int switchPin = 12;  // the number of the pushbutton pin
+const int ledPin = 11;    // the number of the LED pin
+const int buttonPin = 10;  // the number of the pushbutton pin
+
+int buttonState = 0;  // variable for reading the pushbutton status
+int sensorValue = 0;  // value read from the IR sensor
+int loop_resolution = 1; // ms
 int refresh_rate = 100; // ms
 unsigned long startTime = 0;
-unsigned long endTime = 0;
+float endTime = 0;
 unsigned long myTime = 0;
-int start_trigger = 800;
+float floatTime = 0.0;
+int start_trigger = 700;
 int flag = 0;
 int status = 0;
 int counter = 0;
@@ -21,6 +30,12 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void setup() 
 {
+  // initialize the LED pin as an output:
+  pinMode(ledPin, OUTPUT);
+  // initialize the pushbutton pin as an input:
+  pinMode(buttonPin, INPUT);
+  pinMode(switchPin, INPUT);
+
   // put your setup code here, to run once:
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
@@ -36,10 +51,15 @@ void setup()
   lcd.setCursor(0, 1);
   lcd.print("object");
 
+  analogWrite(ledPin, 0);
+
 }
 
 void loop() 
 {
+
+  // read the state of the pushbutton value:
+  buttonState = digitalRead(buttonPin);
 
   // read the analog in value:
   sensorValue = analogRead(analogInPin);
@@ -48,6 +68,9 @@ void loop()
   Serial.print("sensor = ");
   Serial.print(sensorValue);
   Serial.print("\n");
+
+// PWM LED that shows the readaing of IR sensor (conversion of the value !)
+  analogWrite(ledPin, sensorValue/4);
 
   if ((sensorValue < start_trigger) && (status == 0))
   {
@@ -71,6 +94,19 @@ void loop()
 
     }
 
+    if(buttonState == 1)
+    {
+      status = 0;
+      lcd.clear(); 
+      // Set cursor (Column, Row)
+      lcd.setCursor(0, 0);
+      lcd.print("Waiting for");
+      lcd.setCursor(0, 1);
+      lcd.print("object");
+      flag = 0;
+    }
+
+
   }
   else if(status == 2)
   {
@@ -92,8 +128,8 @@ void loop()
         lcd.setCursor(0,1);
         myTime = millis();
         myTime -= startTime;
-        myTime /= 1000.0;
-        lcd.print(myTime);
+        floatTime =  myTime / 1000.0;
+        lcd.print(floatTime);
         counter = 0;
       }
     }
@@ -101,7 +137,18 @@ void loop()
     if (sensorValue < start_trigger)
     {
       status = 3;
-      endTime = myTime;
+      endTime = floatTime;
+    }
+
+    if(buttonState == 1)
+    {
+      status = 0;
+      // Set cursor (Column, Row)
+      lcd.setCursor(0, 0);
+      lcd.print("Waiting for");
+      lcd.setCursor(0, 1);
+      lcd.print("object");
+      flag = 0;
     }
 
   }
@@ -120,10 +167,20 @@ void loop()
     if(0)
     {
       // reset status and all variables
-      statut = 0;
+      status = 0;
 
     }
 
+    if(buttonState == 1)
+    {
+      status = 0;
+      // Set cursor (Column, Row)
+      lcd.setCursor(0, 0);
+      lcd.print("Waiting for");
+      lcd.setCursor(0, 1);
+      lcd.print("object");
+      flag = 0;
+    }
 
   }
   else
