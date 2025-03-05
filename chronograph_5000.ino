@@ -38,7 +38,7 @@ void setup()
 
   // put your setup code here, to run once:
   // initialize serial communications at 9600 bps:
-  Serial.begin(9600);
+  // Serial.begin(9600);
 
   lcd.init();
   // lcd.backlight();
@@ -65,9 +65,9 @@ void loop()
   sensorValue = analogRead(analogInPin);
 
   // print the results to the Serial Monitor:
-  Serial.print("sensor = ");
-  Serial.print(sensorValue);
-  Serial.print("\n");
+  // Serial.print("sensor = ");
+  // Serial.print(sensorValue);
+  // Serial.print("\n");
 
 // PWM LED that shows the readaing of IR sensor (conversion of the value !)
   analogWrite(ledPin, sensorValue/4);
