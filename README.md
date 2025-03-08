@@ -29,3 +29,9 @@ Hardware
 - LED
 - Button
 - Switch
+
+
+Files user manuel
+---
+- chronograph_5000.ino : main file
+- LiquidCrystal_I2C.h : I2C library to print informaiton on a LCD display
